@@ -3,12 +3,12 @@
 $:.unshift File.join(File.dirname(__FILE__), *%w[.. lib])
 
 help = <<HELP
-Jekyll is a blog-aware, static site generator.
+Jekyll-krylls is a blog-aware, static site generator.
 
 Basic Command Line Usage:
-  jekyll                                                   # . -> ./_site
-  jekyll <path to write generated site>                    # . -> <path>
-  jekyll <path to source> <path to write generated site>   # <path> -> <path>
+  jekyll-krylls                                                   # . -> ./_site
+  jekyll-krylls <path to write generated site>                    # . -> <path>
+  jekyll-krylls <path to source> <path to write generated site>   # <path> -> <path>
 
   Configuration is read from '<source>/_config.yml' but can be overriden
   using the following options:
@@ -16,7 +16,7 @@ Basic Command Line Usage:
 HELP
 
 require 'optparse'
-require 'jekyll'
+require 'jekyll-krylls'
 
 exec = {}
 options = {}
@@ -63,7 +63,7 @@ opts = OptionParser.new do |opts|
   end
 
   opts.on("--version", "Display current version") do
-    puts "Jekyll " + Jekyll.version
+    puts "Jekyll-krylls " + Jekyll.version
     exit 0
   end
 end
@@ -80,7 +80,7 @@ case ARGV.size
     options['source']      = ARGV[0]
     options['destination'] = ARGV[1]
   else
-    puts "Invalid options. Run `jekyll --help` for assistance."
+    puts "Invalid options. Run `jekyll-krylls --help` for assistance."
     exit(1)
 end
 

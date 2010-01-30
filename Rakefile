@@ -6,13 +6,12 @@ begin
   gem 'jeweler', '>= 0.11.0'
   require 'jeweler'
   Jeweler::Tasks.new do |s|
-    s.name = "jekyll"
-    s.summary = %Q{Jekyll is a simple, blog aware, static site generator.}
-    s.email = "tom@mojombo.com"
-    s.homepage = "http://github.com/mojombo/jekyll"
-    s.description = "Jekyll is a simple, blog aware, static site generator."
-    s.authors = ["Tom Preston-Werner"]
-    s.rubyforge_project = "jekyll"
+    s.name = "jekyll-krylls"
+    s.summary = %Q{Jekyll-krylls is a simple, blog aware, static site generator.}
+    s.email = "krylls@krylls.com"
+    s.homepage = "http://github.com/krylls/jekyll"
+    s.description = "Jekyll-krylls is a fork of jekyll."
+    s.authors = ["Sean T Allen"]
     s.files.exclude 'test/dest'
     s.test_files.exclude 'test/dest'
     s.add_dependency('RedCloth', '>= 4.2.1')
@@ -35,7 +34,7 @@ end
 
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'jekyll'
+  rdoc.title    = 'jekyll-krylls'
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
@@ -57,7 +56,7 @@ task :default => [:test, :features]
 
 desc "Open an irb session preloaded with this library"
 task :console do
-  sh "irb -rubygems -I lib -r jekyll.rb"
+  sh "irb -rubygems -I lib -r jekyll-krylls.rb"
 end
 
 # converters
@@ -65,15 +64,15 @@ end
 namespace :convert do
   desc "Migrate from mephisto in the current directory"
   task :mephisto do
-    sh %q(ruby -r './lib/jekyll/converters/mephisto' -e 'Jekyll::Mephisto.postgres(:database => "#{ENV["DB"]}")')
+    sh %q(ruby -r './lib/jekyll-krylls/converters/mephisto' -e 'Jekyll::Mephisto.postgres(:database => "#{ENV["DB"]}")')
   end
   desc "Migrate from Movable Type in the current directory"
   task :mt do
-    sh %q(ruby -r './lib/jekyll/converters/mt' -e 'Jekyll::MT.process("#{ENV["DB"]}", "#{ENV["USER"]}", "#{ENV["PASS"]}")')
+    sh %q(ruby -r './lib/jekyll-krylls/converters/mt' -e 'Jekyll::MT.process("#{ENV["DB"]}", "#{ENV["USER"]}", "#{ENV["PASS"]}")')
   end
   desc "Migrate from Typo in the current directory"
   task :typo do
-    sh %q(ruby -r './lib/jekyll/converters/typo' -e 'Jekyll::Typo.process("#{ENV["DB"]}", "#{ENV["USER"]}", "#{ENV["PASS"]}")')
+    sh %q(ruby -r './lib/jekyll-krylls/converters/typo' -e 'Jekyll::Typo.process("#{ENV["DB"]}", "#{ENV["USER"]}", "#{ENV["PASS"]}")')
   end
 end
 

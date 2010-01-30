@@ -5,13 +5,13 @@
 
 Gem::Specification.new do |s|
   s.name = %q{jekyll-krylls}
-  s.version = "0.5.7"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Sean T Allen"]
   s.date = %q{2010-01-30}
   s.default_executable = %q{jekyll-krylls}
-  s.description = %q{Jekyll-krylls is a simple, blog aware, static site generator.}
+  s.description = %q{Jekyll-krylls is a fork of jekyll.}
   s.email = %q{krylls@krylls.com}
   s.executables = ["jekyll-krylls"]
   s.extra_rdoc_files = [
@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
      "features/site_data.feature",
      "features/step_definitions/jekyll_steps.rb",
      "features/support/env.rb",
-     "jekyll.gemspec",
+     "jekyll-krylls.gemspec",
      "lib/jekyll-krylls.rb",
      "lib/jekyll-krylls/albino.rb",
      "lib/jekyll-krylls/converters/csv.rb",
