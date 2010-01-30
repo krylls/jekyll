@@ -1,7 +1,7 @@
 module Jekyll
 
   class Site
-    attr_accessor :config, :layouts, :posts, :pages, :static_files, :categories, :exclude,
+    attr_accessor :config, :layouts, :news, :pages, :static_files, :categories, :exclude,
                   :source, :dest, :lsi, :pygments, :permalink_style, :tags
 
     # Initialize the site
@@ -24,7 +24,7 @@ module Jekyll
 
     def reset
       self.layouts         = {}
-      self.posts           = []
+      self.news            = []
       self.pages           = []
       self.static_files    = []
       self.categories      = Hash.new { |hash, key| hash[key] = [] }
@@ -121,37 +121,37 @@ module Jekyll
       end
     end
 
-    # Read all the files in <source>/<dir>/_posts and create a new Post
+    # Read all the files in <source>/<dir>/_news and create a new NewsItem
     # object with each one.
     #
     # Returns nothing
-    def read_posts(dir)
-      base = File.join(self.source, dir, '_posts')
+    def read_news(dir)
+      base = File.join(self.source, dir, '_news')
       return unless File.exists?(base)
       entries = Dir.chdir(base) { filter_entries(Dir['**/*']) }
 
-      # first pass processes, but does not yet render post content
+      # first pass processes, but does not yet render news item content
       entries.each do |f|
-        if Post.valid?(f)
-          post = Post.new(self, self.source, dir, f)
+        if NewsItem.valid?(f)
+          item = NewsItem.new(self, self.source, dir, f)
 
-          if post.published
-            self.posts << post
-            post.categories.each { |c| self.categories[c] << post }
-            post.tags.each { |c| self.tags[c] << post }
+          if item.published
+            self.news << item
+            item.categories.each { |c| self.categories[c] << item }
+            item.tags.each { |c| self.tags[c] << item }
           end
         end
       end
 
-      self.posts.sort!
+      self.news.sort!
     end
 
     def render
-      self.posts.each do |post|
-        post.render(self.layouts, site_payload)
+      self.news.each do |item|
+        item.render(self.layouts, site_payload)
       end
 
-      self.pages.dup.each do |page|
+      self.news.dup.each do |page|
         if Pager.pagination_enabled?(self.config, page.name)
           paginate(page)
         else
@@ -165,12 +165,12 @@ module Jekyll
       # ignore missing layout dir
     end
 
-    # Write static files, pages and posts
+    # Write static files, pages and news items
     #
     # Returns nothing
     def write
-      self.posts.each do |post|
-        post.write(self.dest)
+      self.news.each do |item|
+        item.write(self.dest)
       end
       self.pages.each do |page|
         page.write(self.dest)
@@ -180,7 +180,7 @@ module Jekyll
       end
     end
 
-    # Reads the directories and finds posts, pages and static files that will 
+    # Reads the directories and finds posts, news items and static files that will 
     # become part of the valid site according to the rules in +filter_entries+.
     #   The +dir+ String is a relative path used to call this method
     #            recursively as it descends through directories
@@ -190,7 +190,7 @@ module Jekyll
       base = File.join(self.source, dir)
       entries = filter_entries(Dir.entries(base))
 
-      self.read_posts(dir)
+      self.read_news(dir)
 
       entries.each do |f|
         f_abs = File.join(base, f)
@@ -211,14 +211,14 @@ module Jekyll
       end
     end
 
-    # Constructs a hash map of Posts indexed by the specified Post attribute
+    # Constructs a hash map of News Items indexed by the specified NewsItem attribute
     #
-    # Returns {post_attr => [<Post>]}
-    def post_attr_hash(post_attr)
-      # Build a hash map based on the specified post attribute ( post attr => array of posts )
+    # Returns {news_attr => [<NewsItem>]}
+    def news_attr_hash(news_attr)
+      # Build a hash map based on the specified news item attribute ( news item attr => array of news items )
       # then sort each array in reverse order
       hash = Hash.new { |hash, key| hash[key] = Array.new }
-      self.posts.each { |p| p.send(post_attr.to_sym).each { |t| hash[t] << p } }
+      self.news.each { |p| p.send(news_attr.to_sym).each { |t| hash[t] << p } }
       hash.values.map { |sortme| sortme.sort! { |a, b| b <=> a} }
       return hash
     end
@@ -226,12 +226,12 @@ module Jekyll
     # The Hash payload containing site-wide data
     #
     # Returns {"site" => {"time" => <Time>,
-    #                     "posts" => [<Post>],
-    #                     "categories" => [<Post>]}
+    #                     "news" => [<NewsItem>],
+    #                     "categories" => [<NewsItem>]}
     def site_payload
       {"site" => self.config.merge({
           "time"       => Time.now,
-          "posts"      => self.posts.sort { |a,b| b <=> a },
+          "posts"      => self.news.sort { |a,b| b <=> a },
           "categories" => post_attr_hash('categories'),
           "tags"       => post_attr_hash('tags')})}
     end
@@ -248,23 +248,23 @@ module Jekyll
       end
     end
 
-    # Paginates the blog's posts. Renders the index.html file into paginated
+    # Paginates the news items. Renders the index.html file into paginated
     # directories, ie: page2/index.html, page3/index.html, etc and adds more
     # site-wide data.
     #   +page+ is the index.html Page that requires pagination
     #
     # {"paginator" => { "page" => <Number>,
     #                   "per_page" => <Number>,
-    #                   "posts" => [<Post>],
-    #                   "total_posts" => <Number>,
+    #                   "news" => [<NewsItems>],
+    #                   "total_items" => <Number>,
     #                   "total_pages" => <Number>,
     #                   "previous_page" => <Number>,
     #                   "next_page" => <Number> }}
     def paginate(page)
-      all_posts = site_payload['site']['posts']
-      pages = Pager.calculate_pages(all_posts, self.config['paginate'].to_i)
+      all_news = site_payload['site']['news']
+      pages = Pager.calculate_pages(all_news, self.config['paginate'].to_i)
       (1..pages).each do |num_page|
-        pager = Pager.new(self.config, num_page, all_posts, pages)
+        pager = Pager.new(self.config, num_page, all_news, pages)
         if num_page > 1
           newpage = Page.new(self, self.source, page.dir, page.name)
           newpage.render(self.layouts, site_payload.merge({'paginator' => pager.to_hash}))

@@ -1,6 +1,6 @@
 module Jekyll
 
-  class Post
+  class NewsItem
     include Comparable
     include Convertible
 
@@ -10,8 +10,8 @@ module Jekyll
 
     MATCHER = /^(.+\/)*(\d+-\d+-\d+)-(.*)(\.[^.]+)$/
 
-    # Post name validator. Post filenames must be like:
-    #   2008-11-05-my-awesome-post.textile
+    # News name validator. News filenames must be like:
+    #   2008-11-05-my-awesome-news.textile
     #
     # Returns <Bool>
     def self.valid?(name)
@@ -24,14 +24,14 @@ module Jekyll
 
     # Initialize this Post instance.
     #   +site+ is the Site
-    #   +base+ is the String path to the dir containing the post file
-    #   +name+ is the String filename of the post file
-    #   +categories+ is an Array of Strings for the categories for this post
+    #   +base+ is the String path to the dir containing the news item file
+    #   +name+ is the String filename of the news item file
+    #   +categories+ is an Array of Strings for the categories for this new item
     #
-    # Returns <Post>
+    # Returns <News>
     def initialize(site, source, dir, name)
       @site = site
-      @base = File.join(source, dir, '_posts')
+      @base = File.join(source, dir, '_news')
       @name = name
 
       self.categories = dir.split('/').reject { |x| x.empty? }
@@ -69,8 +69,8 @@ module Jekyll
       return cmp
     end
 
-    # Extract information from the post filename
-    #   +name+ is the String filename of the post file
+    # Extract information from the news item filename
+    #   +name+ is the String filename of the news item file
     #
     # Returns nothing
     def process(name)
@@ -80,7 +80,7 @@ module Jekyll
       self.ext = ext
     end
 
-    # The generated directory into which the post will be placed
+    # The generated directory into which the news item will be placed
     # upon generation. This is derived from the permalink or, if
     # permalink is absent, set to the default date
     # e.g. "/2008/11/05/" if the permalink style is :date, otherwise nothing
@@ -90,8 +90,8 @@ module Jekyll
       File.dirname(url)
     end
 
-    # The full path and filename of the post.
-    # Defined in the YAML of the post body
+    # The full path and filename of the news item.
+    # Defined in the YAML of the news item body
     # (Optional)
     #
     # Returns <String>
@@ -112,8 +112,8 @@ module Jekyll
       end
     end
 
-    # The generated relative url of this post
-    # e.g. /2008/11/05/my-awesome-post.html
+    # The generated relative url of this news item
+    # e.g. /2008/11/05/my-awesome-news.html
     #
     # Returns <String>
     def url
@@ -130,25 +130,25 @@ module Jekyll
       }.gsub(/\/\//, "/")
     end
 
-    # The UID for this post (useful in feeds)
-    # e.g. /2008/11/05/my-awesome-post
+    # The UID for this news item (useful in feeds)
+    # e.g. /2008/11/05/my-awesome-news
     #
     # Returns <String>
     def id
       File.join(self.dir, self.slug)
     end
 
-    # Calculate related posts.
+    # Calculate related news.
     #
-    # Returns [<Post>]
-    def related_posts(posts)
-      return [] unless posts.size > 1
+    # Returns [<NewsItem>]
+    def related_news(news)
+      return [] unless news.size > 1
 
       if self.site.lsi
         self.class.lsi ||= begin
           puts "Running the classifier... this could take a while."
           lsi = Classifier::LSI.new
-          posts.each { |x| $stdout.print(".");$stdout.flush;lsi.add_item(x) }
+          news.each { |x| $stdout.print(".");$stdout.flush;lsi.add_item(x) }
           puts ""
           lsi
         end
@@ -156,11 +156,11 @@ module Jekyll
         related = self.class.lsi.find_related(self.content, 11)
         related - [self]
       else
-        (posts - [self])[0..9]
+        (news - [self])[0..9]
       end
     end
 
-    # Add any necessary layouts to this post
+    # Add any necessary layouts to this news item
     #   +layouts+ is a Hash of {"name" => "layout"}
     #   +site_payload+ is the site payload hash
     #
@@ -169,7 +169,7 @@ module Jekyll
       # construct payload
       payload =
       {
-        "site" => { "related_posts" => related_posts(site_payload["site"]["posts"]) },
+        "site" => { "related_news" => related_news(site_payload["site"]["news"]) },
         "page" => self.to_liquid
       }
       payload = payload.deep_merge(site_payload)
@@ -177,7 +177,7 @@ module Jekyll
       do_layout(payload, layouts)
     end
 
-    # Write the generated post file to the destination directory.
+    # Write the generated news item file to the destination directory.
     #   +dest+ is the String path to the destination dir
     #
     # Returns nothing
@@ -197,7 +197,7 @@ module Jekyll
       end
     end
 
-    # Convert this post into a Hash for use in Liquid templates.
+    # Convert this news item into a Hash for use in Liquid templates.
     #
     # Returns <Hash>
     def to_liquid
@@ -217,19 +217,19 @@ module Jekyll
     end
 
     def next
-      pos = self.site.posts.index(self)
+      pos = self.site.news.index(self)
 
-      if pos && pos < self.site.posts.length-1
-        self.site.posts[pos+1]
+      if pos && pos < self.site.news.length-1
+        self.site.news[pos+1]
       else
         nil
       end
     end
 
     def previous
-      pos = self.site.posts.index(self)
+      pos = self.site.news.index(self)
       if pos && pos > 0
-        self.site.posts[pos-1]
+        self.site.news[pos-1]
       else
         nil
       end
