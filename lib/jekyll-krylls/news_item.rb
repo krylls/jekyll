@@ -22,13 +22,13 @@ module Jekyll
     attr_accessor :data, :content, :output, :ext
     attr_accessor :date, :slug, :published, :tags, :categories
 
-    # Initialize this Post instance.
+    # Initialize this NewsItem instance.
     #   +site+ is the Site
     #   +base+ is the String path to the dir containing the news item file
     #   +name+ is the String filename of the news item file
     #   +categories+ is an Array of Strings for the categories for this new item
     #
-    # Returns <News>
+    # Returns <NewsItem>
     def initialize(site, source, dir, name)
       @site = site
       @base = File.join(source, dir, '_news')
