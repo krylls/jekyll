@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{jekyll-krylls}
-  s.version = "0.1.2"
+  s.version = "0.1.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Sean T Allen"]
@@ -47,9 +47,9 @@ Gem::Specification.new do |s|
      "lib/jekyll-krylls/core_ext.rb",
      "lib/jekyll-krylls/filters.rb",
      "lib/jekyll-krylls/layout.rb",
+     "lib/jekyll-krylls/news_item.rb",
      "lib/jekyll-krylls/page.rb",
      "lib/jekyll-krylls/pager.rb",
-     "lib/jekyll-krylls/post.rb",
      "lib/jekyll-krylls/site.rb",
      "lib/jekyll-krylls/static_file.rb",
      "lib/jekyll-krylls/tags/highlight.rb",
