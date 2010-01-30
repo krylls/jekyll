@@ -102,11 +102,11 @@ module Jekyll
     def template
       case self.site.permalink_style
       when :pretty
-        "/:categories/:year/:month/:day/:title/"
+        "/news/:categories/:year/:month/:day/:title/"
       when :none
-        "/:categories/:title.html"
+        "/news/:categories/:title.html"
       when :date
-        "/:categories/:year/:month/:day/:title.html"
+        "/news/:categories/:year/:month/:day/:title.html"
       else
         self.site.permalink_style.to_s
       end
