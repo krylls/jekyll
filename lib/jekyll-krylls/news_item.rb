@@ -51,7 +51,7 @@ module Jekyll
       end
     end
 
-    # Spaceship is based on Post#date, slug
+    # Spaceship is based on NewsItem#date, slug
     #
     # Returns -1, 0, 1
     def <=>(other)
@@ -76,7 +76,7 @@ module Jekyll
     # The generated directory into which the news item will be placed
     # upon generation. This is derived from the permalink or, if
     # permalink is absent, set to the default date
-    # e.g. "/2008/11/05/" if the permalink style is :date, otherwise nothing
+    # e.g. "/news/2008/11/05/" if the permalink style is :date, otherwise nothing
     #
     # Returns <String>
     def dir
@@ -106,7 +106,7 @@ module Jekyll
     end
 
     # The generated relative url of this news item
-    # e.g. /2008/11/05/my-awesome-news.html
+    # e.g. /news/2008/11/05/my-awesome-news.html
     #
     # Returns <String>
     def url
@@ -124,7 +124,7 @@ module Jekyll
     end
 
     # The UID for this news item (useful in feeds)
-    # e.g. /2008/11/05/my-awesome-news
+    # e.g. /news/2008/11/05/my-awesome-news
     #
     # Returns <String>
     def id
