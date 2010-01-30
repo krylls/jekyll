@@ -151,7 +151,7 @@ module Jekyll
         item.render(self.layouts, site_payload)
       end
 
-      self.news.dup.each do |page|
+      self.pages.dup.each do |page|
         if Pager.pagination_enabled?(self.config, page.name)
           paginate(page)
         else
@@ -231,9 +231,9 @@ module Jekyll
     def site_payload
       {"site" => self.config.merge({
           "time"       => Time.now,
-          "posts"      => self.news.sort { |a,b| b <=> a },
-          "categories" => post_attr_hash('categories'),
-          "tags"       => post_attr_hash('tags')})}
+          "news"       => self.news.sort { |a,b| b <=> a },
+          "categories" => news_attr_hash('categories'),
+          "tags"       => news_attr_hash('tags')})}
     end
 
     # Filter out any files/directories that are hidden or backup files (start

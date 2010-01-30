@@ -213,7 +213,7 @@ module Jekyll
     end
 
     def inspect
-      "<Post: #{self.id}>"
+      "<NewsItem: #{self.id}>"
     end
 
     def next
