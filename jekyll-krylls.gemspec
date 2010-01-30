@@ -4,16 +4,16 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{jekyll}
+  s.name = %q{jekyll-krylls}
   s.version = "0.5.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Tom Preston-Werner"]
-  s.date = %q{2010-01-12}
-  s.default_executable = %q{jekyll}
-  s.description = %q{Jekyll is a simple, blog aware, static site generator.}
-  s.email = %q{tom@mojombo.com}
-  s.executables = ["jekyll"]
+  s.authors = ["Sean T Allen"]
+  s.date = %q{2010-01-30}
+  s.default_executable = %q{jekyll-krylls}
+  s.description = %q{Jekyll-krylls is a simple, blog aware, static site generator.}
+  s.email = %q{krylls@krylls.com}
+  s.executables = ["jekyll-krylls"]
   s.extra_rdoc_files = [
     "README.textile"
   ]
@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
      "README.textile",
      "Rakefile",
      "VERSION.yml",
-     "bin/jekyll",
+     "bin/jekyll-krylls",
      "features/create_sites.feature",
      "features/embed_filters.feature",
      "features/markdown.feature",
@@ -35,25 +35,25 @@ Gem::Specification.new do |s|
      "features/step_definitions/jekyll_steps.rb",
      "features/support/env.rb",
      "jekyll.gemspec",
-     "lib/jekyll.rb",
-     "lib/jekyll/albino.rb",
-     "lib/jekyll/converters/csv.rb",
-     "lib/jekyll/converters/mephisto.rb",
-     "lib/jekyll/converters/mt.rb",
-     "lib/jekyll/converters/textpattern.rb",
-     "lib/jekyll/converters/typo.rb",
-     "lib/jekyll/converters/wordpress.rb",
-     "lib/jekyll/convertible.rb",
-     "lib/jekyll/core_ext.rb",
-     "lib/jekyll/filters.rb",
-     "lib/jekyll/layout.rb",
-     "lib/jekyll/page.rb",
-     "lib/jekyll/pager.rb",
-     "lib/jekyll/post.rb",
-     "lib/jekyll/site.rb",
-     "lib/jekyll/static_file.rb",
-     "lib/jekyll/tags/highlight.rb",
-     "lib/jekyll/tags/include.rb",
+     "lib/jekyll-krylls.rb",
+     "lib/jekyll-krylls/albino.rb",
+     "lib/jekyll-krylls/converters/csv.rb",
+     "lib/jekyll-krylls/converters/mephisto.rb",
+     "lib/jekyll-krylls/converters/mt.rb",
+     "lib/jekyll-krylls/converters/textpattern.rb",
+     "lib/jekyll-krylls/converters/typo.rb",
+     "lib/jekyll-krylls/converters/wordpress.rb",
+     "lib/jekyll-krylls/convertible.rb",
+     "lib/jekyll-krylls/core_ext.rb",
+     "lib/jekyll-krylls/filters.rb",
+     "lib/jekyll-krylls/layout.rb",
+     "lib/jekyll-krylls/page.rb",
+     "lib/jekyll-krylls/pager.rb",
+     "lib/jekyll-krylls/post.rb",
+     "lib/jekyll-krylls/site.rb",
+     "lib/jekyll-krylls/static_file.rb",
+     "lib/jekyll-krylls/tags/highlight.rb",
+     "lib/jekyll-krylls/tags/include.rb",
      "test/helper.rb",
      "test/source/_includes/sig.markdown",
      "test/source/_layouts/default.html",
@@ -99,12 +99,11 @@ Gem::Specification.new do |s|
      "test/test_site.rb",
      "test/test_tags.rb"
   ]
-  s.homepage = %q{http://github.com/mojombo/jekyll}
+  s.homepage = %q{http://github.com/krylls/jekyll}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubyforge_project = %q{jekyll}
   s.rubygems_version = %q{1.3.5}
-  s.summary = %q{Jekyll is a simple, blog aware, static site generator.}
+  s.summary = %q{Jekyll-krylls is a simple, blog aware, static site generator.}
   s.test_files = [
     "test/helper.rb",
      "test/suite.rb",
