@@ -283,6 +283,7 @@ module Jekyll
           "news"       => self.news.sort { |a,b| b <=> a },
           "shows"      => self.shows.sort { |a,b| b <=> a },
           "upcoming_shows" => self.upcoming_shows.sort{ |a,b| b<=> a },
+          "past_shows" => self.past_shows.sort{ |a,b| b<=> a },
           "categories" => news_attr_hash('categories'),
           "tags"       => news_attr_hash('tags')})}
     end
@@ -336,5 +337,9 @@ module Jekyll
     def upcoming_shows
       self.shows.select{ | show | show.is_upcoming? }
     end 
+    
+    def past_shows
+      self.shows.select{ | show | ! show.is_upcoming? }
+    end
   end
 end
