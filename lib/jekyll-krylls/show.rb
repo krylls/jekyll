@@ -34,7 +34,7 @@ module Jekyll
       end
 
       if self.data.has_key?('venue')
-        self.venue = self.site.venue(self.data["venue"].to_s)
+        self.venue = self.site.venue_named(self.data["venue"].to_s)
       end
             
       if self.data.has_key?('published') && self.data['published'] == false
@@ -191,6 +191,12 @@ module Jekyll
       else
         nil
       end
+    end
+    
+    def is_upcoming?
+      return true if ( self.date.year > Date.today.year )
+      return true if ( self.date.year == Date.today.year && self.date.yday >= Date.today.yday )
+      return false
     end
   end
 end
