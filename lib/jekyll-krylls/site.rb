@@ -1,7 +1,7 @@
 module Jekyll
 
   class Site
-    attr_accessor :config, :layouts, :news, :pages, :static_files, :categories, :exclude,
+    attr_accessor :config, :layouts, :news, :shows, :venues, :pages, :static_files, :categories, :exclude,
                   :source, :dest, :lsi, :pygments, :permalink_style, :tags
 
     # Initialize the site
@@ -25,6 +25,8 @@ module Jekyll
     def reset
       self.layouts         = {}
       self.news            = []
+      self.shows           = []
+      self.venues          = []
       self.pages           = []
       self.static_files    = []
       self.categories      = Hash.new { |hash, key| hash[key] = [] }
@@ -146,11 +148,53 @@ module Jekyll
       self.news.sort!
     end
 
+    # Read all the files in <source>/<dir>/_shows and create a new Show
+    # object with each one.
+    #
+    # Returns nothing
+    def read_shows(dir)
+      base = File.join(self.source, dir, '_shows')
+      return unless File.exists?(base)
+      entries = Dir.chdir(base) { filter_entries(Dir['**/*']) }
+
+      # first pass processes, but does not yet render the show
+      entries.each do |f|
+        if Show.valid?(f)
+          show = Show.new(self, self.source, dir, f)
+
+          if show.published
+            self.shows << show
+          end
+        end
+      end
+
+      self.shows.sort!
+    end
+    
+    # Read all the files in <source>/<dir>/_venues and create a new Venue
+    # object with each one.
+    #
+    # Returns nothing
+    def read_venues(dir)
+      base = File.join(self.source, dir, '_venues')
+      return unless File.exists?(base)
+      entries = Dir.chdir(base) { filter_entries(Dir['**/*']) }
+
+      entries.each do |f|
+          venue = Venue.new(self, self.source, dir, f)
+          self.venues << venue
+      end
+    end
+    
     def render
       self.news.each do |item|
         item.render(self.layouts, site_payload)
       end
 
+      self.shows.each do |show|
+        show.render(self.layouts, site_payload)
+      end
+      
       self.pages.dup.each do |page|
         if Pager.pagination_enabled?(self.config, page.name)
           paginate(page)
@@ -172,6 +216,9 @@ module Jekyll
       self.news.each do |item|
         item.write(self.dest)
       end
+      self.shows.each do |show|
+        show.write(self.dest)
+      end
       self.pages.each do |page|
         page.write(self.dest)
       end
@@ -180,7 +227,7 @@ module Jekyll
       end
     end
 
-    # Reads the directories and finds posts, news items and static files that will 
+    # Reads the directories and finds posts, news items, shows and static files that will 
     # become part of the valid site according to the rules in +filter_entries+.
     #   The +dir+ String is a relative path used to call this method
     #            recursively as it descends through directories
@@ -191,7 +238,9 @@ module Jekyll
       entries = filter_entries(Dir.entries(base))
 
       self.read_news(dir)
-
+      self.read_venues(dir)
+      self.read_shows(dir)
+      
       entries.each do |f|
         f_abs = File.join(base, f)
         f_rel = File.join(dir, f)
@@ -232,6 +281,7 @@ module Jekyll
       {"site" => self.config.merge({
           "time"       => Time.now,
           "news"       => self.news.sort { |a,b| b <=> a },
+          "shows"      => self.shows.sort { |a,b| b <=> a },
           "categories" => news_attr_hash('categories'),
           "tags"       => news_attr_hash('tags')})}
     end
@@ -274,6 +324,12 @@ module Jekyll
           page.render(self.layouts, site_payload.merge({'paginator' => pager.to_hash}))
         end
       end
+    end
+    
+    def venue( name )
+      venues.each{ | venue | 
+        return venue if venue.name == name 
+      }
     end
   end
 end

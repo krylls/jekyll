@@ -1,17 +1,12 @@
 module Jekyll
-
-  class NewsItem
+  class Show
     include Comparable
     include Convertible
-
-    class << self
-      attr_accessor :lsi
-    end
-
+    
     MATCHER = /^(.+\/)*(\d+-\d+-\d+)-(.*)(\.[^.]+)$/
 
-    # News name validator. News filenames must be like:
-    #   2008-11-05-my-awesome-news.textile
+    # show name validator. Show filenames must be like:
+    #   2008-11-05-don-pedro
     #
     # Returns <Bool>
     def self.valid?(name)
@@ -20,14 +15,14 @@ module Jekyll
 
     attr_accessor :site
     attr_accessor :data, :content, :output, :ext
-    attr_accessor :date, :slug, :published, :tags, :categories
+    attr_accessor :date, :slug, :published
+    attr_accessor :venue
 
     def initialize(site, source, dir, name)
       @site = site
-      @base = File.join(source, dir, '_news')
+      @base = File.join(source, dir, '_shows')
       @name = name
 
-      self.categories = dir.split('/').reject { |x| x.empty? }
       self.process(name)
       self.read_yaml(@base, name)
 
@@ -38,32 +33,25 @@ module Jekyll
         self.date = Time.parse(self.data["date"].to_s)
       end
 
+      if self.data.has_key?('venue')
+        self.venue = self.site.venue(self.data["venue"].to_s)
+      end
+            
       if self.data.has_key?('published') && self.data['published'] == false
         self.published = false
       else
         self.published = true
       end
-
-      self.tags = self.data.pluralized_array("tag", "tags")
-
-      if self.categories.empty?
-        self.categories = self.data.pluralized_array('category', 'categories')
-      end
     end
-
-    # Spaceship is based on NewsItem#date, slug
-    #
+    
     # Returns -1, 0, 1
     def <=>(other)
       cmp = self.date <=> other.date
-      if 0 == cmp
-       cmp = self.slug <=> other.slug
-      end
       return cmp
     end
-
-    # Extract information from the news item filename
-    #   +name+ is the String filename of the news item file
+    
+    # Extract information from the show filename
+    #   +name+ is the String filename of the show file
     #
     # Returns nothing
     def process(name)
@@ -72,11 +60,11 @@ module Jekyll
       self.slug = slug
       self.ext = ext
     end
-
-    # The generated directory into which the news item will be placed
+    
+    # The generated directory into which the show will be placed
     # upon generation. This is derived from the permalink or, if
     # permalink is absent, set to the default date
-    # e.g. "/news/2008/11/05/" if the permalink style is :date, otherwise nothing
+    # e.g. "/shows/2008/11/05/" if the permalink style is :date, otherwise nothing
     #
     # Returns <String>
     def dir
@@ -91,22 +79,22 @@ module Jekyll
     def permalink
       self.data && self.data['permalink']
     end
-
+    
     def template
       case self.site.permalink_style
       when :pretty
-        "/news/:categories/:year/:month/:day/:title/"
+        "/shows/:year/:month/:day/:title/"
       when :none
-        "/news/:categories/:title.html"
+        "/shows/:title.html"
       when :date
-        "/news/:categories/:year/:month/:day/:title.html"
+        "/shows/:year/:month/:day/:title.html"
       else
         self.site.permalink_style.to_s
       end
     end
 
-    # The generated relative url of this news item
-    # e.g. /news/2008/11/05/my-awesome-news.html
+    # The generated relative url of this show
+    # e.g. /shows/2008/11/05/my-awesome-news.html
     #
     # Returns <String>
     def url
@@ -117,43 +105,20 @@ module Jekyll
         "month"      => date.strftime("%m"),
         "day"        => date.strftime("%d"),
         "title"      => CGI.escape(slug),
-        "categories" => categories.join('/')
       }.inject(template) { |result, token|
         result.gsub(/:#{token.first}/, token.last)
       }.gsub(/\/\//, "/")
     end
-
-    # The UID for this news item (useful in feeds)
-    # e.g. /news/2008/11/05/my-awesome-news
+    
+    # The UID for this show (useful in feeds)
+    # e.g. /shows/2008/11/05/my-awesome-news
     #
     # Returns <String>
     def id
       File.join(self.dir, self.slug)
     end
-
-    # Calculate related news.
-    #
-    # Returns [<NewsItem>]
-    def related_news(news)
-      return [] unless news.size > 1
-
-      if self.site.lsi
-        self.class.lsi ||= begin
-          puts "Running the classifier... this could take a while."
-          lsi = Classifier::LSI.new
-          news.each { |x| $stdout.print(".");$stdout.flush;lsi.add_item(x) }
-          puts ""
-          lsi
-        end
-
-        related = self.class.lsi.find_related(self.content, 11)
-        related - [self]
-      else
-        (news - [self])[0..9]
-      end
-    end
-
-    # Add any necessary layouts to this news item
+    
+    # Add any necessary layouts to this show
     #   +layouts+ is a Hash of {"name" => "layout"}
     #   +site_payload+ is the site payload hash
     #
@@ -162,15 +127,15 @@ module Jekyll
       # construct payload
       payload =
       {
-        "site" => { "related_news" => related_news(site_payload["site"]["news"]) },
+        "site" => {},
         "page" => self.to_liquid
       }
       payload = payload.deep_merge(site_payload)
 
       do_layout(payload, layouts)
     end
-
-    # Write the generated news item file to the destination directory.
+    
+    # Write the generated show file to the destination directory.
     #   +dest+ is the String path to the destination dir
     #
     # Returns nothing
@@ -189,45 +154,43 @@ module Jekyll
         f.write(self.output)
       end
     end
-
-    # Convert this news item into a Hash for use in Liquid templates.
+    
+    # Convert this show into a Hash for use in Liquid templates.
     #
     # Returns <Hash>
     def to_liquid
       self.data.deep_merge(
-      { "title"      => self.data["title"] || self.slug.split('-').select {|w| w.capitalize! || w }.join(' '),
-        "url"        => self.url,
-        "date"       => self.date,
-        "id"         => self.id,
-        "categories" => self.categories,
-        "next"       => self.next,
-        "previous"   => self.previous,
-        "tags"       => self.tags,
-        "content"    => self.content })
+      { "title"    => self.data["title"] || self.slug.split('-').select {|w| w.capitalize! || w }.join(' '),
+      "url"        => self.url,
+      "date"       => self.date,
+      "venue"      => self.venue,
+      "id"         => self.id,
+      "next"       => self.next,
+      "previous"   => self.previous,
+      "content"    => self.content })
     end
 
     def inspect
-      "<NewsItem: #{self.id}>"
+      "<Show: #{self.id}>"
     end
 
     def next
-      pos = self.site.news.index(self)
+      pos = self.site.shows.index(self)
 
-      if pos && pos < self.site.news.length-1
-        self.site.news[pos+1]
+      if pos && pos < self.site.shows.length-1
+        self.site.shows[pos+1]
       else
         nil
       end
     end
-
+    
     def previous
-      pos = self.site.news.index(self)
+      pos = self.site.shows.index(self)
       if pos && pos > 0
-        self.site.news[pos-1]
+        self.site.shows[pos-1]
       else
         nil
       end
     end
   end
-
 end
