@@ -279,13 +279,13 @@ module Jekyll
     #                     "categories" => [<NewsItem>]}
     def site_payload
       {"site" => self.config.merge({
-          "time"       => Time.now,
-          "news"       => self.news.sort { |a,b| b <=> a },
-          "shows"      => self.shows.sort { |a,b| b <=> a },
-          "upcoming_shows" => self.upcoming_shows.sort{ |a,b| b<=> a },
-          "past_shows" => self.past_shows.sort{ |a,b| b<=> a },
-          "categories" => news_attr_hash('categories'),
-          "tags"       => news_attr_hash('tags')})}
+          "time"           => Time.now,
+          "news"           => self.news.sort { |a,b| b <=> a },
+          "shows"          => self.shows.sort { |a,b| b <=> a },
+          "upcoming_shows" => self.upcoming_shows.sort{ |a,b|  a <=> b },
+          "past_shows"     => self.past_shows.sort{ |a,b| b <=> a },
+          "categories"     => news_attr_hash('categories'),
+          "tags"           => news_attr_hash('tags')})}
     end
 
     # Filter out any files/directories that are hidden or backup files (start
