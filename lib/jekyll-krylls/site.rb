@@ -37,6 +37,18 @@ module Jekyll
       # Check to see if LSI is enabled.
       require 'classifier' if self.lsi
 
+      if self.config['haml']
+        begin
+          require 'haml'
+          require 'jekyll-krylls/haml_helpers'
+          helpers = File.join(source, '_helpers.rb')
+          require helpers if File.exist?(helpers)
+          puts 'Enabled Haml'
+        rescue LoadError
+          puts 'You must have the haml gem installed first'
+        end
+      end
+
       # Set the Markdown interpreter (and Maruku self.config, if necessary)
       case self.config['markdown']
         when 'rdiscount'

@@ -22,6 +22,7 @@ module Jekyll
 
       self.process(name)
       self.read_yaml(base, name)
+      self.transform
     end
 
     # Extract information from the layout filename

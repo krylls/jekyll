@@ -42,6 +42,10 @@ module Jekyll
       when 'markdown'
         self.ext = ".html"
         self.content = self.site.markdown(self.content)
+      when 'haml'
+        self.ext = ".html"
+        # Actually rendered in do_layout.
+        self.content = Haml::Engine.new(self.content, :attr_wrapper => %{"})
       end
     end
 
@@ -55,8 +59,22 @@ module Jekyll
         return 'textile'
       when /markdown/i, /mkdn/i, /md/i, /mkd/i
         return 'markdown'
+      when /haml/i
+        return 'haml'
       end
       return 'unknown'
+    end
+
+    # Sets up a context for Haml and renders in it. The context has accessors
+    # matching the passed-in hash, e.g. "site", "page" and "content", and has
+    # helper modules mixed in.
+    #
+    # Returns String.
+    def render_haml_in_context(haml_engine, params={})
+      context = ClosedStruct.new(params)
+      context.extend(HamlHelpers)
+      context.extend(::Helpers) if defined?(::Helpers)
+      haml_engine.render(context)
     end
 
     # Add any necessary layouts to this convertible document
@@ -69,8 +87,15 @@ module Jekyll
 
       # render and transform content (this becomes the final content of the object)
       payload["content_type"] = self.content_type
-      self.content = Liquid::Template.parse(self.content).render(payload, info)
-      self.transform
+      if self.content_type == "haml"
+        self.transform
+        self.content = render_haml_in_context(self.content,
+          :site => self.site,
+          :page => ClosedStruct.new(payload["page"]))
+      else
+        self.content = Liquid::Template.parse(self.content).render(payload, info)
+        self.transform
+      end
 
       # output keeps track of what will finally be written
       self.output = self.content
@@ -79,7 +104,15 @@ module Jekyll
       layout = layouts[self.data["layout"]]
       while layout
         payload = payload.deep_merge({"content" => self.output, "page" => layout.data})
-        self.output = Liquid::Template.parse(layout.content).render(payload, info)
+
+        if site.config['haml'] && layout.content.is_a?(Haml::Engine)
+          self.output = render_haml_in_context(layout.content,
+            :site => ClosedStruct.new(payload["site"]),
+            :page => ClosedStruct.new(payload["page"]),
+            :content => payload["content"])
+        else
+          self.output = Liquid::Template.parse(layout.content).render(payload, info)
+        end
 
         layout = layouts[layout.data["layout"]]
       end
