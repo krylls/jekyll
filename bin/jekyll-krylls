@@ -62,6 +62,10 @@ opts = OptionParser.new do |opts|
     end
   end
 
+  opts.on("--sass", "Use Sass from haml gem for CSS generation") do
+    options['sass'] = true
+  end
+
   opts.on("--haml", "Enable using Haml for posts and pages") do
     options['haml'] = true
   end
